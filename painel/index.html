@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Painel de Vendas | Acervo Digital VIP</title>
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="color-scheme" content="dark">
+  <meta name="darkreader-lock">
+  
+  <!-- Fontes -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace']
+          },
+          colors: {
+            brand: {
+              dark: '#06070a',
+              card: '#0c0e14',
+              border: '#1a1f2c'
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      background-color: #06070a;
+      color: #f4f4f5;
+    }
+    .glass-panel {
+      background: rgba(12, 14, 20, 0.75);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+    }
+    .glass-card {
+      background: rgba(18, 21, 30, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+    .glass-card:hover {
+      border-color: rgba(16, 185, 129, 0.3);
+    }
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.02);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(16, 185, 129, 0.4);
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col font-sans selection:bg-emerald-500 selection:text-black">
+
+  <!-- ==========================================
+       TELA DE BLOQUEIO POR PIN ADMINISTRATIVO
+       ========================================== -->
+  <div id="pin-overlay" class="fixed inset-0 z-50 bg-[#06070a]/95 backdrop-blur-2xl flex items-center justify-center p-4">
+    <div class="glass-panel p-8 rounded-3xl border border-emerald-500/30 max-w-sm w-full text-center shadow-2xl relative overflow-hidden">
+      <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-400 text-black flex items-center justify-center text-3xl font-black mx-auto mb-5 shadow-lg shadow-emerald-500/20">
+        ⚡
+      </div>
+      <h2 class="text-xl font-black text-white tracking-tight">Painel de Vendas VIP</h2>
+      <p class="text-xs text-zinc-400 mt-1 mb-6">Acesso restrito ao administrador do Acervo</p>
+      
+      <form onsubmit="validarPin(event)" class="space-y-4">
+        <div>
+          <label for="input-pin" class="block text-[11px] font-bold text-zinc-400 uppercase tracking-wider mb-2">Digite seu PIN de Acesso</label>
+          <input type="password" id="input-pin" maxlength="6" autofocus placeholder="••••" class="w-full text-center text-2xl tracking-[0.5em] font-mono py-3 px-4 rounded-xl bg-white/5 border border-white/10 text-emerald-400 focus:outline-none focus:border-emerald-500 focus:bg-white/10 transition-all">
+        </div>
+        <p id="pin-erro" class="text-xs font-semibold text-rose-400 hidden animate-pulse">PIN incorreto. Tente novamente.</p>
+        <button type="submit" class="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-400 text-black font-black text-xs uppercase tracking-wider hover:opacity-90 transition-all shadow-lg shadow-emerald-500/20">
+          Entrar no Painel
+        </button>
+      </form>
+      <div class="mt-6 pt-4 border-t border-white/5 flex items-center justify-between text-[11px] text-zinc-500">
+        <span>Acervo Digital VIP</span>
+        <a href="/" class="hover:text-emerald-400 transition-colors">Voltar ao Site</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       CONTEÚDO PRINCIPAL DO PAINEL
+       ========================================== -->
+  <div id="painel-conteudo" class="hidden flex-1 flex flex-col">
+    <!-- Topbar -->
+    <header class="border-b border-white/10 glass-panel sticky top-0 z-30">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex items-center justify-between gap-4">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-emerald-500 to-teal-400 text-black flex items-center justify-center font-black text-lg shadow-md shadow-emerald-500/20">
+            ⚡
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <h1 class="text-sm sm:text-base font-black text-white tracking-tight">Acervo Digital VIP</h1>
+              <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">Vendas</span>
+            </div>
+            <p class="text-[11px] text-zinc-400">Controle de Pagamentos Pix & Liberação 7 Dias</p>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <a href="/" target="_blank" class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-zinc-300 text-xs font-bold border border-white/10 transition-colors">
+            <span>🌐 Ver Site</span>
+          </a>
+          <button onclick="bloquearPainel()" class="px-3 py-1.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 text-xs font-bold border border-rose-500/20 transition-colors">
+            🔒 Sair
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 w-full space-y-8">
+      
+      <!-- CARDS DE MÉTRICAS (KPIS) -->
+      <section class="grid grid-cols-2 lg:grid-cols-5 gap-4">
+        <!-- Faturamento Total -->
+        <div class="glass-card p-5 rounded-2xl border border-white/5 relative overflow-hidden">
+          <div class="text-[11px] font-bold text-zinc-400 uppercase tracking-wider mb-1">Faturamento Total</div>
+          <div id="kpi-faturamento" class="text-2xl sm:text-3xl font-black text-emerald-400 font-mono">R$ 0,00</div>
+          <span class="text-[10px] text-zinc-500 block mt-1">Acumulado aprovado</span>
+        </div>
+
+        <!-- Total de Vendas -->
+        <div class="glass-card p-5 rounded-2xl border border-white/5 relative overflow-hidden">
+          <div class="text-[11px] font-bold text-zinc-400 uppercase tracking-wider mb-1">Total de Vendas</div>
+          <div id="kpi-vendas-qtd" class="text-2xl sm:text-3xl font-black text-white font-mono">0</div>
+          <span class="text-[10px] text-zinc-500 block mt-1">Pedidos registrados</span>
+        </div>
+
+        <!-- Vendas Hoje -->
+        <div class="glass-card p-5 rounded-2xl border border-white/5 relative overflow-hidden">
+          <div class="text-[11px] font-bold text-zinc-400 uppercase tracking-wider mb-1">Vendas Hoje</div>
+          <div id="kpi-vendas-hoje" class="text-2xl sm:text-3xl font-black text-cyan-400 font-mono">0</div>
+          <span class="text-[10px] text-emerald-400 flex items-center gap-1 mt-1">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Pix Instantâneo
+          </span>
+        </div>
+
+        <!-- Liberados Dia 8 (Total) -->
+        <div class="glass-card p-5 rounded-2xl border border-white/5 relative overflow-hidden">
+          <div class="text-[11px] font-bold text-zinc-400 uppercase tracking-wider mb-1">Liberados (Dia 8)</div>
+          <div id="kpi-liberados-8" class="text-2xl sm:text-3xl font-black text-purple-400 font-mono">0</div>
+          <span class="text-[10px] text-zinc-500 block mt-1">68 tópicos desbloqueados</span>
+        </div>
+
+        <!-- Fase 1 (Em Integração 1-7 dias) -->
+        <div class="glass-card p-5 rounded-2xl border border-white/5 relative overflow-hidden col-span-2 lg:col-span-1">
+          <div class="text-[11px] font-bold text-zinc-400 uppercase tracking-wider mb-1">Fase 1 (1 a 7 Dias)</div>
+          <div id="kpi-fase-1" class="text-2xl sm:text-3xl font-black text-amber-400 font-mono">0</div>
+          <span class="text-[10px] text-zinc-500 block mt-1">Período de garantia CDC</span>
+        </div>
+      </section>
+
+      <!-- BARRA DE OPERAÇÕES: BUSCA, FILTROS E AÇÕES -->
+      <section class="glass-panel p-5 rounded-2xl border border-white/10 space-y-4">
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+          <!-- Campo de Busca -->
+          <div class="relative flex-1 max-w-md">
+            <input type="text" id="filtro-busca" oninput="renderizarTabela()" placeholder="🔍 Buscar por nome, WhatsApp ou ID..." class="w-full py-2.5 pl-4 pr-10 rounded-xl bg-white/5 border border-white/10 text-white text-xs placeholder:text-zinc-500 focus:outline-none focus:border-emerald-500 focus:bg-white/10 transition-all">
+            <span class="absolute right-3 top-2.5 text-xs text-zinc-500">⌘F</span>
+          </div>
+
+          <!-- Botões de Ação Principal -->
+          <div class="flex items-center flex-wrap gap-2">
+            <button onclick="abrirModalNovaVenda()" class="px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-400 text-black font-black text-xs uppercase tracking-wide hover:opacity-90 transition-all shadow-md shadow-emerald-500/20 flex items-center gap-1.5">
+              <span>+</span> Nova Venda Pix
+            </button>
+            <button onclick="exportarCSV()" class="px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-zinc-300 font-bold text-xs border border-white/10 transition-colors flex items-center gap-1.5">
+              <span>📊</span> Exportar CSV
+            </button>
+            <button onclick="exportarJSON()" class="px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-zinc-300 font-bold text-xs border border-white/10 transition-colors flex items-center gap-1.5">
+              <span>💾</span> Backup JSON
+            </button>
+            <label class="px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-zinc-300 font-bold text-xs border border-white/10 transition-colors cursor-pointer flex items-center gap-1.5">
+              <span>📂</span> Restaurar
+              <input type="file" id="input-importar-json" accept=".json" onchange="importarJSON(event)" class="hidden">
+            </label>
+          </div>
+        </div>
+
+        <!-- Filtros por Status -->
+        <div class="flex items-center gap-2 overflow-x-auto pb-1 text-xs">
+          <span class="text-zinc-500 text-[11px] font-bold uppercase tracking-wider shrink-0 mr-1">Filtrar:</span>
+          <button onclick="setFiltroStatus('todos', this)" class="btn-filtro active px-3 py-1.5 rounded-lg font-bold bg-emerald-500 text-black border border-emerald-400 transition-all">
+            Todos (<span id="cont-todos">0</span>)
+          </button>
+          <button onclick="setFiltroStatus('pago', this)" class="btn-filtro px-3 py-1.5 rounded-lg font-bold bg-white/5 text-zinc-300 border border-white/10 hover:border-emerald-500/30 transition-all">
+            Pagos (<span id="cont-pagos">0</span>)
+          </button>
+          <button onclick="setFiltroStatus('pendente', this)" class="btn-filtro px-3 py-1.5 rounded-lg font-bold bg-white/5 text-zinc-300 border border-white/10 hover:border-amber-500/30 transition-all">
+            Pendentes (<span id="cont-pendentes">0</span>)
+          </button>
+          <button onclick="setFiltroStatus('liberado_8', this)" class="btn-filtro px-3 py-1.5 rounded-lg font-bold bg-white/5 text-zinc-300 border border-white/10 hover:border-purple-500/30 transition-all">
+            Liberados Dia 8 (<span id="cont-liberados-8">0</span>)
+          </button>
+        </div>
+      </section>
+
+      <!-- TABELA DE VENDAS -->
+      <section class="glass-panel rounded-2xl border border-white/10 overflow-hidden shadow-2xl">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-black/60 text-zinc-400 uppercase tracking-wider font-semibold border-b border-white/10">
+              <tr>
+                <th class="py-3.5 px-4">Venda / ID</th>
+                <th class="py-3.5 px-4">Data / Hora</th>
+                <th class="py-3.5 px-4">Cliente (WhatsApp / Telegram)</th>
+                <th class="py-3.5 px-4">Valor</th>
+                <th class="py-3.5 px-4">Pagamento</th>
+                <th class="py-3.5 px-4">Fase de Acesso (7 Dias)</th>
+                <th class="py-3.5 px-4 text-right">Ações</th>
+              </tr>
+            </thead>
+            <tbody id="tabela-vendas-body" class="divide-y divide-white/5 text-zinc-300">
+              <!-- Renderizado via JavaScript -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Estado Vazio -->
+        <div id="estado-vazio" class="hidden p-12 text-center">
+          <div class="w-12 h-12 rounded-2xl bg-white/5 text-zinc-400 flex items-center justify-center text-2xl mx-auto mb-3">
+            📭
+          </div>
+          <h3 class="text-sm font-bold text-white">Nenhuma venda encontrada</h3>
+          <p class="text-xs text-zinc-500 mt-1">Ajuste os filtros de busca ou cadastre uma nova venda Pix.</p>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer do Painel -->
+    <footer class="border-t border-white/10 py-4 px-6 text-center text-xs text-zinc-500">
+      Acervo Digital VIP • Painel Administrativo de Gestão de Vendas • Protegido por PIN
+    </footer>
+  </div>
+
+  <!-- ==========================================
+       MODAL: NOVA VENDA / EDITAR VENDA
+       ========================================== -->
+  <div id="modal-venda" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden items-center justify-center p-4">
+    <div class="glass-panel p-6 sm:p-8 rounded-3xl border border-emerald-500/40 max-w-lg w-full relative shadow-2xl">
+      <button onclick="fecharModalVenda()" class="absolute top-4 right-4 text-zinc-400 hover:text-white w-8 h-8 rounded-full bg-white/5 flex items-center justify-center">
+        ✕
+      </button>
+
+      <div class="flex items-center gap-3 mb-5">
+        <div class="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-black text-lg">
+          📝
+        </div>
+        <div>
+          <h3 id="modal-venda-titulo" class="text-lg font-black text-white">Cadastrar Nova Venda Pix</h3>
+          <p class="text-xs text-zinc-400">Preencha os dados do comprador para registro e controle</p>
+        </div>
+      </div>
+
+      <form onsubmit="salvarVenda(event)" class="space-y-4 text-xs">
+        <input type="hidden" id="venda-id-edicao">
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block font-bold text-zinc-300 mb-1">Nome Completo</label>
+            <input type="text" id="venda-nome" required placeholder="Ex: Lucas Silva" class="w-full py-2.5 px-3 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-emerald-500">
+          </div>
+          <div>
+            <label class="block font-bold text-zinc-300 mb-1">WhatsApp (DDD + Número)</label>
+            <input type="text" id="venda-whatsapp" required placeholder="Ex: 71999999999" class="w-full py-2.5 px-3 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-emerald-500">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div>
+            <label class="block font-bold text-zinc-300 mb-1">Usuário Telegram (@)</label>
+            <input type="text" id="venda-telegram" placeholder="@usuario" class="w-full py-2.5 px-3 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-emerald-500">
+          </div>
+          <div>
+            <label class="block font-bold text-zinc-300 mb-1">Valor (R$)</label>
+            <input type="number" step="0.01" id="venda-valor" value="9.90" required class="w-full py-2.5 px-3 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-emerald-500">
+          </div>
+          <div>
+            <label class="block font-bold text-zinc-300 mb-1">Status Pagamento</label>
+            <select id="venda-status" class="w-full py-2.5 px-3 rounded-xl bg-zinc-900 border border-white/10 text-white focus:outline-none focus:border-emerald-500">
+              <option value="pago">✅ Pago / Aprovado</option>
+              <option value="pendente">⏳ Pendente</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block font-bold text-zinc-300 mb-1">Data da Venda</label>
+            <input type="datetime-local" id="venda-data" required class="w-full py-2.5 px-3 rounded-xl bg-zinc-900 border border-white/10 text-white focus:outline-none focus:border-emerald-500">
+          </div>
+          <div>
+            <label class="block font-bold text-zinc-300 mb-1">ID Transação / Comprovante</label>
+            <input type="text" id="venda-transacao" placeholder="Ex: PIX-948271" class="w-full py-2.5 px-3 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-emerald-500">
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-bold text-zinc-300 mb-1">Observações / Notas Internas</label>
+          <input type="text" id="venda-obs" placeholder="Ex: Comprovante verificado no app do banco" class="w-full py-2.5 px-3 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:border-emerald-500">
+        </div>
+
+        <div class="pt-3 border-t border-white/10 flex items-center justify-end gap-2">
+          <button type="button" onclick="fecharModalVenda()" class="px-4 py-2.5 rounded-xl bg-white/5 text-zinc-300 font-bold hover:bg-white/10 transition-colors">
+            Cancelar
+          </button>
+          <button type="submit" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-400 text-black font-black uppercase tracking-wider hover:opacity-90 transition-all shadow-md shadow-emerald-500/20">
+            Salvar Venda
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       TOAST DE NOTIFICAÇÃO
+       ========================================== -->
+  <div id="toast" class="fixed bottom-6 right-6 z-50 transform translate-y-32 opacity-0 transition-all duration-300 bg-zinc-900/95 border border-emerald-500/40 px-4 py-3 rounded-2xl shadow-2xl flex items-center gap-3 backdrop-blur-xl">
+    <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+    <span id="toast-mensagem" class="text-xs font-bold text-white">Ação concluída com sucesso!</span>
+  </div>
+
+  <!-- ==========================================
+       SCRIPTS JAVASCRIPT DO PAINEL
+       ========================================== -->
+  <script>
+    const PIN_CORRETO = "2026";
+    const CHAVE_STORAGE = "acervo_vendas_db";
+    let filtroStatusAtual = "todos";
+
+    // 1. Controle de PIN e Autenticação
+    function verificarSessao() {
+      const auth = sessionStorage.getItem("acervo_painel_auth");
+      if (auth === "true") {
+        document.getElementById("pin-overlay").classList.add("hidden");
+        document.getElementById("painel-conteudo").classList.remove("hidden");
+        carregarVendasIniciais();
+        renderizarTabela();
+      } else {
+        document.getElementById("pin-overlay").classList.remove("hidden");
+        document.getElementById("painel-conteudo").classList.add("hidden");
+      }
+    }
+
+    function validarPin(e) {
+      e.preventDefault();
+      const pin = document.getElementById("input-pin").value.trim();
+      const erroEl = document.getElementById("pin-erro");
+
+      if (pin === PIN_CORRETO) {
+        sessionStorage.setItem("acervo_painel_auth", "true");
+        document.getElementById("pin-overlay").classList.add("hidden");
+        document.getElementById("painel-conteudo").classList.remove("hidden");
+        carregarVendasIniciais();
+        renderizarTabela();
+        mostrarToast("Acesso liberado com sucesso!");
+      } else {
+        erroEl.classList.remove("hidden");
+        document.getElementById("input-pin").value = "";
+        document.getElementById("input-pin").focus();
+      }
+    }
+
+    function bloquearPainel() {
+      sessionStorage.removeItem("acervo_painel_auth");
+      location.reload();
+    }
+
+    // 2. Base de Dados Inicial (Seed caso vazio)
+    function carregarVendasIniciais() {
+      const data = localStorage.getItem(CHAVE_STORAGE);
+      if (!data) {
+        const agora = new Date();
+        const diasAtras = (d) => new Date(agora.getTime() - d * 24 * 60 * 60 * 1000).toISOString();
+
+        const seedVendas = [
+          {
+            id: "VIP-1001",
+            nome: "Matheus Andrade",
+            whatsapp: "71992348811",
+            telegram: "@matheus_dev",
+            valor: 9.90,
+            status: "pago",
+            data: diasAtras(10), // Mais de 7 dias -> Total Liberado
+            transacao: "E71928374920",
+            obs: "Pix verificado • Membro antigo"
+          },
+          {
+            id: "VIP-1002",
+            nome: "Camila Rocha",
+            whatsapp: "11988223344",
+            telegram: "@camila_mkt",
+            valor: 9.90,
+            status: "pago",
+            data: diasAtras(8), // Mais de 7 dias -> Total Liberado
+            transacao: "E18293746501",
+            obs: "Interesse em cursos de Tráfego"
+          },
+          {
+            id: "VIP-1003",
+            nome: "Rafael Menezes",
+            whatsapp: "21971234455",
+            telegram: "@rafael_ia",
+            valor: 9.90,
+            status: "pago",
+            data: diasAtras(3), // 3 dias -> Fase 1 (Dia 3 de 7)
+            transacao: "E99281726354",
+            obs: "Acessando Microcursos de IA"
+          },
+          {
+            id: "VIP-1004",
+            nome: "Juliana Duarte",
+            whatsapp: "31998765432",
+            telegram: "@juliana_design",
+            valor: 9.90,
+            status: "pago",
+            data: diasAtras(1), // 1 dia -> Fase 1 (Dia 1 de 7)
+            transacao: "E48291039485",
+            obs: "Comunidade VIP no Telegram"
+          },
+          {
+            id: "VIP-1005",
+            nome: "Felipe Siqueira",
+            whatsapp: "81987651234",
+            telegram: "@felipe_games",
+            valor: 9.90,
+            status: "pendente",
+            data: diasAtras(0), // Hoje -> Pendente
+            transacao: "PEND-849201",
+            obs: "Aguardando comprovante no bot"
+          }
+        ];
+        salvarDb(seedVendas);
+      }
+    }
+
+    function obterVendas() {
+      try {
+        return JSON.parse(localStorage.getItem(CHAVE_STORAGE)) || [];
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function salvarDb(vendas) {
+      localStorage.setItem(CHAVE_STORAGE, JSON.stringify(vendas));
+    }
+
+    // 3. Cálculo dos 7 Dias / Fases
+    function calcularFaseAcesso(dataIso, status) {
+      if (status !== 'pago') {
+        return {
+          tipo: 'pendente',
+          texto: 'Aguardando Pagamento',
+          badgeClass: 'bg-zinc-800 text-zinc-400 border-zinc-700'
+        };
+      }
+
+      const agora = new Date();
+      const dataCompra = new Date(dataIso);
+      const diffMs = agora - dataCompra;
+      const diffDias = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+      if (diffDias >= 7) {
+        return {
+          tipo: 'liberado_8',
+          texto: '🔓 Fase 2: Total Liberado (68 Tópicos)',
+          badgeClass: 'bg-purple-500/15 text-purple-400 border-purple-500/30'
+        };
+      } else {
+        const diaAtual = diffDias + 1;
+        return {
+          tipo: 'fase_1',
+          texto: `⚡ Fase 1: Dia ${diaAtual} de 7 (Comunidade & Cursos)`,
+          badgeClass: 'bg-amber-500/15 text-amber-400 border-amber-500/30'
+        };
+      }
+    }
+
+    // 4. Renderização da Tabela e KPIs
+    function renderizarTabela() {
+      const vendas = obterVendas();
+      const termo = (document.getElementById("filtro-busca").value || "").toLowerCase().trim();
+      const tbody = document.getElementById("tabela-vendas-body");
+      const estadoVazio = document.getElementById("estado-vazio");
+
+      let totalFaturamento = 0;
+      let qtdPagos = 0;
+      let qtdPendentes = 0;
+      let qtdLiberados8 = 0;
+      let qtdFase1 = 0;
+      let vendasHoje = 0;
+
+      const hojeStr = new Date().toISOString().split("T")[0];
+
+      vendas.forEach(v => {
+        const fase = calcularFaseAcesso(v.data, v.status);
+        if (v.status === 'pago') {
+          totalFaturamento += Number(v.valor) || 0;
+          qtdPagos++;
+          if (fase.tipo === 'liberado_8') qtdLiberados8++;
+          if (fase.tipo === 'fase_1') qtdFase1++;
+
+          if (v.data && v.data.startsWith(hojeStr)) {
+            vendasHoje++;
+          }
+        } else {
+          qtdPendentes++;
+        }
+      });
+
+      // Atualizar KPIs
+      document.getElementById("kpi-faturamento").textContent = totalFaturamento.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+      document.getElementById("kpi-vendas-qtd").textContent = vendas.length;
+      document.getElementById("kpi-vendas-hoje").textContent = vendasHoje;
+      document.getElementById("kpi-liberados-8").textContent = qtdLiberados8;
+      document.getElementById("kpi-fase-1").textContent = qtdFase1;
+
+      // Atualizar contadores nos filtros
+      document.getElementById("cont-todos").textContent = vendas.length;
+      document.getElementById("cont-pagos").textContent = qtdPagos;
+      document.getElementById("cont-pendentes").textContent = qtdPendentes;
+      document.getElementById("cont-liberados-8").textContent = qtdLiberados8;
+
+      // Filtragem de linhas
+      const linhasFiltradas = vendas.filter(v => {
+        const fase = calcularFaseAcesso(v.data, v.status);
+
+        // Filtro de status
+        if (filtroStatusAtual === 'pago' && v.status !== 'pago') return false;
+        if (filtroStatusAtual === 'pendente' && v.status !== 'pendente') return false;
+        if (filtroStatusAtual === 'liberado_8' && fase.tipo !== 'liberado_8') return false;
+
+        // Filtro de busca
+        if (termo) {
+          const matchNome = (v.nome || "").toLowerCase().includes(termo);
+          const matchZap = (v.whatsapp || "").toLowerCase().includes(termo);
+          const matchId = (v.id || "").toLowerCase().includes(termo);
+          const matchTelegram = (v.telegram || "").toLowerCase().includes(termo);
+          if (!matchNome && !matchZap && !matchId && !matchTelegram) return false;
+        }
+
+        return true;
+      });
+
+      tbody.innerHTML = "";
+
+      if (linhasFiltradas.length === 0) {
+        estadoVazio.classList.remove("hidden");
+      } else {
+        estadoVazio.classList.add("hidden");
+
+        linhasFiltradas.forEach(v => {
+          const fase = calcularFaseAcesso(v.data, v.status);
+          const dataFmt = new Date(v.data).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' });
+          const zapNum = (v.whatsapp || "").replace(/\D/g, "");
+          const zapLink = `https://wa.me/55${zapNum}?text=` + encodeURIComponent(
+            `Olá ${v.nome}! 🎉\n\nConfirmamos seu pagamento no valor de R$ ${Number(v.valor).toFixed(2)} pelo Acervo Digital VIP!\n\nSeu acesso imediato já está disponível no Bot Oficial do Telegram:\n👉 https://t.me/AcervoDigitalVIP_bot\n\nVocê já tem acesso à Comunidade VIP, Microcursos e Ferramentas. No 8º dia, seu download completo de todos os 68 tópicos é liberado 100% de forma automática.\n\nQualquer dúvida, estamos à disposição!`
+          );
+
+          const tr = document.createElement("tr");
+          tr.className = "hover:bg-white/[0.02] transition-colors";
+          tr.innerHTML = `
+            <td class="py-3.5 px-4 font-mono font-bold text-white">${v.id}</td>
+            <td class="py-3.5 px-4 text-zinc-400 whitespace-nowrap">${dataFmt}</td>
+            <td class="py-3.5 px-4">
+              <div class="font-bold text-white">${v.nome}</div>
+              <div class="text-[11px] text-zinc-400 flex items-center gap-2">
+                <span>📱 ${v.whatsapp || 'S/N'}</span>
+                <span>•</span>
+                <span class="text-emerald-400 font-mono">${v.telegram || '@vip'}</span>
+              </div>
+            </td>
+            <td class="py-3.5 px-4 font-mono font-bold text-emerald-400">R$ ${Number(v.valor).toFixed(2)}</td>
+            <td class="py-3.5 px-4">
+              <span class="px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider border ${v.status === 'pago' ? 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30' : 'bg-amber-500/15 text-amber-400 border-amber-500/30'}">
+                ${v.status === 'pago' ? 'Pago' : 'Pendente'}
+              </span>
+            </td>
+            <td class="py-3.5 px-4">
+              <span class="px-2.5 py-1 rounded-full text-[10px] font-bold border inline-block ${fase.badgeClass}">
+                ${fase.texto}
+              </span>
+            </td>
+            <td class="py-3.5 px-4 text-right whitespace-nowrap">
+              <div class="flex items-center justify-end gap-1.5">
+                ${zapNum ? `
+                  <a href="${zapLink}" target="_blank" title="Enviar Acesso via WhatsApp" class="p-1.5 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 transition-colors">
+                    💬
+                  </a>
+                ` : ''}
+                <button onclick="alternarStatus('${v.id}')" title="Alternar Status (Pago/Pendente)" class="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-zinc-300 border border-white/10 transition-colors">
+                  🔄
+                </button>
+                <button onclick="editarVenda('${v.id}')" title="Editar Venda" class="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-zinc-300 border border-white/10 transition-colors">
+                  ✏️
+                </button>
+                <button onclick="excluirVenda('${v.id}')" title="Excluir Venda" class="p-1.5 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/20 transition-colors">
+                  🗑️
+                </button>
+              </div>
+            </td>
+          `;
+          tbody.appendChild(tr);
+        });
+      }
+    }
+
+    // 5. Filtros de Status
+    function setFiltroStatus(status, btn) {
+      filtroStatusAtual = status;
+      document.querySelectorAll(".btn-filtro").forEach(b => {
+        b.classList.remove("bg-emerald-500", "text-black", "border-emerald-400", "active");
+        b.classList.add("bg-white/5", "text-zinc-300", "border-white/10");
+      });
+      btn.classList.add("bg-emerald-500", "text-black", "border-emerald-400", "active");
+      btn.classList.remove("bg-white/5", "text-zinc-300", "border-white/10");
+      renderizarTabela();
+    }
+
+    // 6. Modal de Criação / Edição
+    function abrirModalNovaVenda() {
+      document.getElementById("modal-venda-titulo").textContent = "Cadastrar Nova Venda Pix";
+      document.getElementById("venda-id-edicao").value = "";
+      document.getElementById("venda-nome").value = "";
+      document.getElementById("venda-whatsapp").value = "";
+      document.getElementById("venda-telegram").value = "";
+      document.getElementById("venda-valor").value = "9.90";
+      document.getElementById("venda-status").value = "pago";
+      document.getElementById("venda-obs").value = "";
+      
+      // Data atual no formato datetime-local
+      const agora = new Date();
+      agora.setMinutes(agora.getMinutes() - agora.getTimezoneOffset());
+      document.getElementById("venda-data").value = agora.toISOString().slice(0, 16);
+      document.getElementById("venda-transacao").value = "PIX-" + Math.floor(100000 + Math.random() * 900000);
+
+      document.getElementById("modal-venda").classList.remove("hidden");
+      document.getElementById("modal-venda").classList.add("flex");
+    }
+
+    function editarVenda(id) {
+      const vendas = obterVendas();
+      const v = vendas.find(item => item.id === id);
+      if (!v) return;
+
+      document.getElementById("modal-venda-titulo").textContent = "Editar Venda: " + v.id;
+      document.getElementById("venda-id-edicao").value = v.id;
+      document.getElementById("venda-nome").value = v.nome || "";
+      document.getElementById("venda-whatsapp").value = v.whatsapp || "";
+      document.getElementById("venda-telegram").value = v.telegram || "";
+      document.getElementById("venda-valor").value = v.valor || 9.90;
+      document.getElementById("venda-status").value = v.status || "pago";
+      document.getElementById("venda-obs").value = v.obs || "";
+      document.getElementById("venda-transacao").value = v.transacao || "";
+
+      if (v.data) {
+        const d = new Date(v.data);
+        d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+        document.getElementById("venda-data").value = d.toISOString().slice(0, 16);
+      }
+
+      document.getElementById("modal-venda").classList.remove("hidden");
+      document.getElementById("modal-venda").classList.add("flex");
+    }
+
+    function fecharModalVenda() {
+      document.getElementById("modal-venda").classList.remove("flex");
+      document.getElementById("modal-venda").classList.add("hidden");
+    }
+
+    function salvarVenda(e) {
+      e.preventDefault();
+      const vendas = obterVendas();
+      const idEdicao = document.getElementById("venda-id-edicao").value;
+
+      const novaVenda = {
+        id: idEdicao || ("VIP-" + (1000 + vendas.length + 1)),
+        nome: document.getElementById("venda-nome").value.trim(),
+        whatsapp: document.getElementById("venda-whatsapp").value.trim(),
+        telegram: document.getElementById("venda-telegram").value.trim(),
+        valor: parseFloat(document.getElementById("venda-valor").value) || 9.90,
+        status: document.getElementById("venda-status").value,
+        data: new Date(document.getElementById("venda-data").value).toISOString(),
+        transacao: document.getElementById("venda-transacao").value.trim(),
+        obs: document.getElementById("venda-obs").value.trim()
+      };
+
+      if (idEdicao) {
+        const idx = vendas.findIndex(item => item.id === idEdicao);
+        if (idx !== -1) vendas[idx] = novaVenda;
+        mostrarToast("Venda atualizada com sucesso!");
+      } else {
+        vendas.unshift(novaVenda);
+        mostrarToast("Nova venda Pix cadastrada!");
+      }
+
+      salvarDb(vendas);
+      fecharModalVenda();
+      renderizarTabela();
+    }
+
+    function alternarStatus(id) {
+      const vendas = obterVendas();
+      const v = vendas.find(item => item.id === id);
+      if (!v) return;
+
+      v.status = (v.status === 'pago') ? 'pendente' : 'pago';
+      salvarDb(vendas);
+      renderizarTabela();
+      mostrarToast(`Status alterado para: ${v.status.toUpperCase()}`);
+    }
+
+    function excluirVenda(id) {
+      if (!confirm(`Deseja realmente excluir o registro da venda ${id}?`)) return;
+      let vendas = obterVendas();
+      vendas = vendas.filter(item => item.id !== id);
+      salvarDb(vendas);
+      renderizarTabela();
+      mostrarToast("Registro de venda excluído.");
+    }
+
+    // 7. Exportação e Importação (CSV & JSON)
+    function exportarCSV() {
+      const vendas = obterVendas();
+      if (vendas.length === 0) {
+        alert("Nenhuma venda para exportar.");
+        return;
+      }
+
+      let csv = "ID;Data;Nome;WhatsApp;Telegram;Valor_R$;Status;Fase_Acesso;ID_Transacao;Notas\n";
+      vendas.forEach(v => {
+        const fase = calcularFaseAcesso(v.data, v.status);
+        const dataFmt = new Date(v.data).toLocaleString('pt-BR');
+        csv += `"${v.id}";"${dataFmt}";"${v.nome}";"${v.whatsapp}";"${v.telegram}";"${v.valor}";"${v.status}";"${fase.texto}";"${v.transacao || ''}";"${v.obs || ''}"\n`;
+      });
+
+      // Adiciona BOM UTF-8 para compatibilidade perfeita com Excel no Windows
+      const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `vendas_acervo_digital_vip_${new Date().toISOString().slice(0, 10)}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+      mostrarToast("Planilha CSV exportada!");
+    }
+
+    function exportarJSON() {
+      const vendas = obterVendas();
+      const blob = new Blob([JSON.stringify(vendas, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `backup_vendas_acervo_vip_${new Date().toISOString().slice(0, 10)}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+      mostrarToast("Backup JSON gerado com sucesso!");
+    }
+
+    function importarJSON(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        try {
+          const dados = JSON.parse(event.target.result);
+          if (Array.isArray(dados)) {
+            salvarDb(dados);
+            renderizarTabela();
+            mostrarToast(`${dados.length} vendas importadas com sucesso!`);
+          } else {
+            alert("Formato JSON inválido. O arquivo deve conter uma lista de vendas.");
+          }
+        } catch (err) {
+          alert("Erro ao ler arquivo JSON: " + err.message);
+        }
+      };
+      reader.readAsText(file);
+      e.target.value = "";
+    }
+
+    // 8. Toasts e Atalhos
+    function mostrarToast(msg) {
+      const toast = document.getElementById("toast");
+      const msgEl = document.getElementById("toast-mensagem");
+      msgEl.textContent = msg;
+
+      toast.classList.remove("translate-y-32", "opacity-0");
+      toast.classList.add("translate-y-0", "opacity-100");
+
+      setTimeout(() => {
+        toast.classList.remove("translate-y-0", "opacity-100");
+        toast.classList.add("translate-y-32", "opacity-0");
+      }, 3500);
+    }
+
+    // Atalho Escape fecha modal
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        fecharModalVenda();
+      }
+    });
+
+    // Iniciar na carga
+    window.addEventListener("DOMContentLoaded", verificarSessao);
+  </script>
+</body>
+</html>
