@@ -40,18 +40,33 @@
     body {
       background-color: #06070a;
       color: #f4f4f5;
+      font-size: 15px;
+    }
+    h1 {
+      font-size: 1.75rem;
+      line-height: 2rem;
+    }
+    h2 {
+      font-size: 1.25rem;
+      line-height: 1.75rem;
+    }
+    h3 {
+      font-size: 1rem;
+      line-height: 1.5rem;
     }
     .glass-panel {
       background: rgba(12, 14, 20, 0.75);
       border: 1px solid rgba(255, 255, 255, 0.08);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
+      padding: 1.5rem;
     }
     .glass-card {
       background: rgba(18, 21, 30, 0.6);
       border: 1px solid rgba(255, 255, 255, 0.06);
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
+      padding: 1.25rem;
     }
     .glass-card:hover {
       border-color: rgba(16, 185, 129, 0.3);
@@ -111,15 +126,15 @@
     <header class="border-b border-white/10 glass-panel sticky top-0 z-30">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex items-center justify-between gap-4">
         <div class="flex items-center gap-3">
-          <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-emerald-500 to-teal-400 text-black flex items-center justify-center font-black text-lg shadow-md shadow-emerald-500/20">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-500 to-teal-400 text-black flex items-center justify-center font-black text-xl shadow-md shadow-emerald-500/20">
             ⚡
           </div>
           <div>
             <div class="flex items-center gap-2">
-              <h1 class="text-sm sm:text-base font-black text-white tracking-tight">Acervo Digital VIP</h1>
-              <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">Vendas</span>
+              <h1 class="text-lg sm:text-2xl font-black text-white tracking-tight">Acervo Digital VIP</h1>
+              <span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">Vendas</span>
             </div>
-            <p class="text-[11px] text-zinc-400">Controle de Pagamentos Pix & Liberação 7 Dias</p>
+            <p class="text-xs text-zinc-400 mt-0.5">Controle de Pagamentos Pix & Liberação 7 Dias</p>
           </div>
         </div>
 
@@ -155,16 +170,16 @@
         <!-- Vendas Hoje -->
         <div class="glass-card p-5 rounded-2xl border border-white/5 relative overflow-hidden">
           <div class="text-[11px] font-bold text-zinc-400 uppercase tracking-wider mb-1">Vendas Hoje</div>
-          <div id="kpi-vendas-hoje" class="text-2xl sm:text-3xl font-black text-cyan-400 font-mono">0</div>
-          <span class="text-[10px] text-emerald-400 flex items-center gap-1 mt-1">
-            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Pix Instantâneo
+          <div id="kpi-vendas-hoje" class="text-2xl sm:text-3xl font-black text-emerald-300 font-mono">0</div>
+          <span class="text-[10px] text-emerald-400 flex items-center gap-1.5 mt-1">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Pix Instantâneo
           </span>
         </div>
 
         <!-- Liberados Dia 8 (Total) -->
         <div class="glass-card p-5 rounded-2xl border border-white/5 relative overflow-hidden">
           <div class="text-[11px] font-bold text-zinc-400 uppercase tracking-wider mb-1">Liberados (Dia 8)</div>
-          <div id="kpi-liberados-8" class="text-2xl sm:text-3xl font-black text-purple-400 font-mono">0</div>
+          <div id="kpi-liberados-8" class="text-2xl sm:text-3xl font-black text-teal-300 font-mono">0</div>
           <span class="text-[10px] text-zinc-500 block mt-1">68 tópicos desbloqueados</span>
         </div>
 
@@ -247,7 +262,7 @@
           <div class="w-12 h-12 rounded-2xl bg-white/5 text-zinc-400 flex items-center justify-center text-2xl mx-auto mb-3">
             📭
           </div>
-          <h3 class="text-sm font-bold text-white">Nenhuma venda encontrada</h3>
+          <h2 class="text-sm font-bold text-white">Nenhuma venda encontrada</h2>
           <p class="text-xs text-zinc-500 mt-1">Ajuste os filtros de busca ou cadastre uma nova venda Pix.</p>
         </div>
       </section>
@@ -342,7 +357,7 @@
        TOAST DE NOTIFICAÇÃO
        ========================================== -->
   <div id="toast" class="fixed bottom-6 right-6 z-50 transform translate-y-32 opacity-0 transition-all duration-300 bg-zinc-900/95 border border-emerald-500/40 px-4 py-3 rounded-2xl shadow-2xl flex items-center gap-3 backdrop-blur-xl">
-    <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+    <span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
     <span id="toast-mensagem" class="text-xs font-bold text-white">Ação concluída com sucesso!</span>
   </div>
 
