@@ -15,6 +15,21 @@
   
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Firebase SDK (Compat) -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyDkHFOxDdyQFhJLU0zh07KTCCmKDe1kjjk",
+      authDomain: "davirianapps.firebaseapp.com",
+      projectId: "davirianapps",
+      storageBucket: "davirianapps.firebasestorage.app",
+      messagingSenderId: "267597175042",
+      appId: "1:267597175042:web:c328f9992a79263ada8a1b"
+    };
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+    window.acervoDb = firebase.firestore();
+  </script>
   <script>
     tailwind.config = {
       darkMode: 'class',
@@ -409,6 +424,18 @@
 
     // 2. Base de Dados Inicial (Seed caso vazio)
     function carregarVendasIniciais() {
+      // Sincroniza em tempo real do Cloud Firestore
+      if (window.acervoDb) {
+        window.acervoDb.collection("acervo_vendas").onSnapshot(snapshot => {
+          const nuvem = [];
+          snapshot.forEach(doc => nuvem.push(doc.data()));
+          if (nuvem.length > 0) {
+            localStorage.setItem(CHAVE_STORAGE, JSON.stringify(nuvem));
+            renderizarTodoPainel();
+          }
+        }, () => {});
+      }
+
       const data = localStorage.getItem(CHAVE_STORAGE);
       if (!data) {
         const agora = new Date();
@@ -485,6 +512,13 @@
 
     function salvarDb(vendas) {
       localStorage.setItem(CHAVE_STORAGE, JSON.stringify(vendas));
+      if (window.acervoDb && Array.isArray(vendas)) {
+        vendas.forEach(v => {
+          if (v && v.id) {
+            window.acervoDb.collection("acervo_vendas").doc(String(v.id)).set(v, { merge: true }).catch(() => {});
+          }
+        });
+      }
     }
 
     // 3. Cálculo dos 7 Dias / Fases
@@ -599,17 +633,18 @@
             `Olá ${v.nome}! 🎉\n\nConfirmamos seu pagamento no valor de R$ ${Number(v.valor).toFixed(2)} pelo Acervo Digital VIP!\n\nSeu acesso imediato já está disponível no Bot Oficial do Telegram:\n👉 https://t.me/AcervoDigitalVIP_bot\n\nVocê já tem acesso à Comunidade VIP, Microcursos e Ferramentas. No 8º dia, seu download completo de todos os 68 tópicos é liberado 100% de forma automática.\n\nQualquer dúvida, estamos à disposição!`
           );
 
+          const esc = (s) => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
           const tr = document.createElement("tr");
           tr.className = "hover:bg-white/[0.02] transition-colors";
           tr.innerHTML = `
-            <td class="py-3.5 px-4 font-mono font-bold text-white">${v.id}</td>
-            <td class="py-3.5 px-4 text-zinc-400 whitespace-nowrap">${dataFmt}</td>
+            <td class="py-3.5 px-4 font-mono font-bold text-white">${esc(v.id)}</td>
+            <td class="py-3.5 px-4 text-zinc-400 whitespace-nowrap">${esc(dataFmt)}</td>
             <td class="py-3.5 px-4">
-              <div class="font-bold text-white">${v.nome}</div>
+              <div class="font-bold text-white">${esc(v.nome)}</div>
               <div class="text-[11px] text-zinc-400 flex items-center gap-2">
-                <span>📱 ${v.whatsapp || 'S/N'}</span>
+                <span>📱 ${esc(v.whatsapp || 'S/N')}</span>
                 <span>•</span>
-                <span class="text-emerald-400 font-mono">${v.telegram || '@vip'}</span>
+                <span class="text-emerald-400 font-mono">${esc(v.telegram || '@vip')}</span>
               </div>
             </td>
             <td class="py-3.5 px-4 font-mono font-bold text-emerald-400">R$ ${Number(v.valor).toFixed(2)}</td>
